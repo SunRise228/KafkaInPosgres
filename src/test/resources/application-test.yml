@@ -1,0 +1,19 @@
+
+topic.name.consumer: company
+
+test:
+  topic: embedded-test-topic
+
+server:
+  port: 8888
+
+spring:
+  kafka:
+    consumer:
+      bootstrap-servers: 192.168.246.111:9092
+      group-id: vova_test_finaltest2
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  flyway:
+    locations: db.migration
