@@ -1,45 +1,91 @@
 package com.test.test;
 
-import com.test.test.model.Message;
-import com.test.test.repository.MessageRepository;
-import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import lombok.RequiredArgsConstructor;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.test.test.model.Company;
+import com.test.test.model.Employee;
+import com.test.test.model.EmployeeRole;
+import com.test.test.repository.CompanyRepository;
+import com.test.test.repository.EmployeeRepository;
+import net.minidev.json.JSONObject;
+import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.net.URI;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.testcontainers.shaded.org.hamcrest.MatcherAssert.assertThat;
 
-@RunWith(SpringRunner.class)
 @ActiveProfiles("test")
-@SpringBootTest(classes = {TestApplication.class})
+@SpringBootTest(classes = {TestApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TestApplicationTests {
 
+	@LocalServerPort
+	private int port;
+
 	@Autowired
-	MessageRepository messageRepository;
+	CompanyRepository companyRepository;
+
+	@Autowired
+	EmployeeRepository employeeRepository;
+
+	@Autowired
+	private TestRestTemplate restTemplate;
 
 	@Test
 	public void embeddedDbTest() {
 
-		Message addedMessage =  new Message(UUID.fromString("8a39ebbc-dc72-4848-b20e-5490a1ea0638"), "test3", "test3", "test3");
+		Company addedMessage =  Company.builder()
+				.id(UUID.fromString("8a39ebbc-dc72-4848-b20e-5490a1ea0638"))
+				.country("test3")
+				.name("test3")
+				.tin("test3")
+				.createTime(Instant.now())
+				.lastUpdateTime(Instant.now())
+				.build();
 
-		messageRepository.save(addedMessage);
+		companyRepository.save(addedMessage);
 
-		for (Message repositoryIterrator : messageRepository.findAll()) {
-			if(repositoryIterrator.getId().equals(addedMessage.getId())){
-				Assert.isTrue(true, "Test passed");
-				return;
-			}
-		}
+		Optional<Company> entityExist = companyRepository.findById(addedMessage.getId());
+		Assertions.assertTrue(entityExist.isPresent());
 
-		Assert.isTrue(false, "Test failed");
+	}
+
+	@Test
+	public void flywayInsertTest() {
+		boolean foundAllInserts = companyRepository.findById(UUID.fromString("1cdf735a-37b5-5eca-9308-c48c42236264")).isPresent();
+		Assertions.assertTrue(foundAllInserts);
+	}
+
+	@Test
+	public void restTemplate() {
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.setBearerAuth("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEiLCJpYXQiOjE2ODc3ODQzNDAsImV4cCI6MTY4Nzg3MDc0MH0.rWE88qim15qSXq7SlKFoH6WOv8oXpc_Z5Y3bcQ-Nv5E");
+
+
+		JSONObject parameters = new JSONObject();
+		parameters.put("companyId", "feeb1473-bc49-56ad-839a-e0435a2d98c8");
+		parameters.put("name", "Dar2");
+		parameters.put("salary", 120);
+		parameters.put("email", "dar2@softclub.by");
+		parameters.put("role", "EMPLOYEE");
+
+
+		RequestEntity requestEntity = new RequestEntity(parameters, headers, HttpMethod.POST, URI.create("http://localhost:8888/employee"));
+		ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
+
+		Assertions.assertNotNull(responseEntity);
 	}
 
 }

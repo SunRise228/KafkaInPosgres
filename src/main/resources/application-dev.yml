@@ -6,12 +6,18 @@ test:
 
 server:
   port: 8888
+  ssl:
+    enabled: true
+    key-store-type: PKCS12
+    key-store: classpath:ssl/selfsigned.jks
+    key-store-password: Vova6666
+  forward-headers-strategy : framework
 
 spring:
   kafka:
     consumer:
       bootstrap-servers: 192.168.246.111:9092
-      group-id: vova_test_finaltest3
+      group-id: vova_test5
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -22,3 +28,23 @@ spring:
     schemas: public
     enabled: true
 
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+
+swagger-properties:
+  title: SwaggerTest
+  description: Сервис для проверки навыков :)
+  version: 1.0
+  terms-of-service-url: https://softclub.com/category/en-services/
+  license-name: Softclub © 2023
+  contact-name: SoftClub Ltd.
+  contact-url: https://softclub.com
+  contact-email: info@softclub.com
+
+springdoc:
+  swagger-ui:
+    path: /sw
+  api-docs:
+    path: /sc
+  packages-to-scan: com.test.test.controller

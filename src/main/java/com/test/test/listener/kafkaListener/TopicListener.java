@@ -1,20 +1,17 @@
 package com.test.test.listener.kafkaListener;
 
-import com.test.test.model.Message;
-import com.test.test.repository.MessageRepository;
+import com.test.test.model.Company;
+import com.test.test.repository.CompanyRepository;
 import com.test.test.util.JsonHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Header;
-import org.apache.kafka.common.protocol.types.Field;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.UUID;
+import java.time.Instant;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,16 +20,16 @@ public class TopicListener {
     @Value("${topic.name.consumer}")
     private String topicName;
 
-    private final MessageRepository messageRepository;
-
-    private final String topicKeyToFind = "__TypeId__";
-    private final String topicValueToFind = "company";
+    private final CompanyRepository messageRepository;
 
     private boolean headerIsGood(Header header) {
-        if(!topicKeyToFind.equals(header.key())) {
+        String TOPIC_KEY_TO_FIND = "__TypeId__";
+        String TOPIC_VALUE_TO_FIND = "company";
+
+        if(!TOPIC_KEY_TO_FIND.equals(header.key())) {
             return false;
         }
-        return topicValueToFind.equals(new String(header.value()));
+        return TOPIC_VALUE_TO_FIND.equals(new String(header.value()));
     }
 
     @KafkaListener(topics = "${topic.name.consumer}", groupId = "${spring.kafka.consumer.group-id}", concurrency = "${scanner.concurrency:1}")
@@ -41,10 +38,12 @@ public class TopicListener {
             if(!headerIsGood(headersIterator)) {
                 continue;
             }
-            Message message = JsonHelper.fromJson(payload.value(), Message.class);
-            if (message != null) {
-                messageRepository.save(message);
-            }
+            Company company = JsonHelper.fromJson(payload.value(), Company.class);
+            company.setCreateTime(Instant.now());
+            company.setLastUpdateTime(Instant.now());
+            messageRepository.save(company);
         }
     }
+
+
 }
