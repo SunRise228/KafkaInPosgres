@@ -2,6 +2,7 @@ package com.test.test.configuration;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.*;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 

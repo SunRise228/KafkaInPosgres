@@ -5,6 +5,7 @@ import com.test.test.model.Employee;
 import com.test.test.model.EmployeeRole;
 import com.test.test.publisher.eventpublisher.PostgresEventPublisher;
 import com.test.test.service.CompanyService;
+import com.test.test.service.CustomMetricService;
 import com.test.test.service.EmployeeService;
 import com.test.test.service.ValidationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +24,9 @@ import java.util.UUID;
 @RequestMapping("/company")
 @Tag(name = "Company")
 public class CompanyRestController {
+
+    @Autowired
+    CustomMetricService customMetricService;
 
     @Autowired
     private PostgresEventPublisher postgresEventPublisher;

@@ -7,11 +7,26 @@ test:
 server:
   port: 8888
   ssl:
-    enabled: true
+    enabled: false
     key-store-type: PKCS12
     key-store: classpath:ssl/selfsigned.jks
     key-store-password: Vova6666
   forward-headers-strategy : framework
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
 
 spring:
   kafka:

@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -82,8 +83,8 @@ public class TestApplicationTests {
 		parameters.put("role", "EMPLOYEE");
 
 
-		RequestEntity requestEntity = new RequestEntity(parameters, headers, HttpMethod.POST, URI.create("http://localhost:8888/employee"));
-		ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
+		RequestEntity requestEntity = new RequestEntity(parameters, headers, HttpMethod.POST, URI.create("https://localhost:8888/employee"));
+		ResponseEntity<HttpStatus> responseEntity = restTemplate.exchange(requestEntity, HttpStatus.class);
 
 		Assertions.assertNotNull(responseEntity);
 	}

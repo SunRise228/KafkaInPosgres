@@ -22,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
@@ -69,9 +70,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((auth -> auth.requestMatchers(AUTH_WHITELIST).permitAll()
-                                                    .requestMatchers(HttpMethod.POST, AUTH_BLACKLIST).hasAuthority("ADMIN")
-                                                    .anyRequest().authenticated()))
+                .authorizeHttpRequests((auth -> auth.anyRequest().permitAll()))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout.addLogoutHandler(logoutService));
